@@ -1,0 +1,7 @@
+{
+    "pack": {
+        "pack_format": 15,
+        "supported_formats": [15,100],
+        "description": "Gloom gear style.§7By Royal Bronzeror §b(1.21.x)"
+    }
+}
