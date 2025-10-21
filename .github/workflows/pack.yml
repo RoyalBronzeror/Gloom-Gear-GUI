@@ -1,0 +1,68 @@
+name: Pack "PACK" Folder
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Release tag (e.g., v0.1.0)'
+        required: true
+        default: 'v0.1.0'
+      release_type:
+        description: 'Release type'
+        required: true
+        type: choice
+        options:
+        - release
+        - beta
+        - alpha
+        default: 'release'
+      release_body:
+        description: 'Release description (supports Markdown)'
+        required: false
+        default: 'Automated package release'
+        type: textarea
+
+jobs:
+  pack-folder:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Verify project structure
+      run: |
+        echo "=== Project Root Structure ==="
+        ls -la
+        echo ""
+        echo "=== PACK Folder Contents ==="
+        ls -la PACK/ || echo "PACK directory does not exist"
+
+    - name: Create package
+      run: |
+        cd PACK
+        zip -r "../Gloom-Gear-${{ github.event.inputs.release_tag }}.zip" ./*
+
+    - name: Create Release
+      if: github.event_name == 'workflow_dispatch'
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ github.event.inputs.release_tag }}
+        name: ${{ github.event.inputs.release_tag }}-${{ github.event.inputs.release_type }}
+        body: |
+          ${{ github.event.inputs.release_body }}
+        files: |
+          Gloom-Gear-${{ github.event.inputs.release_tag }}.zip
+        draft: false
+        prerelease: ${{ github.event.inputs.release_type != 'release' }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Upload Artifact
+      if: github.event_name != 'workflow_dispatch'
+      uses: actions/upload-artifact@v4
+      with:
+        name: Gloom-Gear
+        path: Gloom-Gear-${{ github.event.inputs.release_tag }}.zip
