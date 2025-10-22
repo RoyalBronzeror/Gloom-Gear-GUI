@@ -101,9 +101,10 @@ jobs:
         name: ${{ steps.set-release-name.outputs.RELEASE_NAME }}
         body: |
           ${{ github.event.inputs.release_body }}
+
+          ---
           
-          **Installation**
-          Download and place the zip file directly in your Minecraft resource packs folder.
+          **Installation**: Download and place the zip file directly in your Minecraft resource packs folder.
           
           ---
           Released on ${{ steps.date.outputs.CURRENT_DATE }}
