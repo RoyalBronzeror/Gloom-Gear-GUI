@@ -77,6 +77,12 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+    - name: Get current date
+      if: github.event_name == 'workflow_dispatch'
+      id: date
+      run: |
+        echo "CURRENT_DATE=$(date '+%Y-%m-%d')" >> $GITHUB_OUTPUT
+
     - name: Set release name
       if: github.event_name == 'workflow_dispatch'
       id: set-release-name
@@ -94,22 +100,13 @@ jobs:
         tag_name: ${{ fromJSON(format('"{0}"', github.event.inputs.version_type)) && (github.event.inputs.version_type == 'release' && github.event.inputs.release_tag || format('{0}-{1}', github.event.inputs.release_tag, github.event.inputs.version_type)) }}
         name: ${{ steps.set-release-name.outputs.RELEASE_NAME }}
         body: |
-          # ${{ github.event.inputs.release_name }} ${{ github.event.inputs.release_tag }}${{ github.event.inputs.version_type != 'release' && format('-{0}', github.event.inputs.version_type) || '' }}
-          
           ${{ github.event.inputs.release_body }}
           
-          ## Package Details
-          - **Version**: ${{ github.event.inputs.release_tag }}${{ github.event.inputs.version_type != 'release' && format('-{0}', github.event.inputs.version_type) || '' }}
-          - **Version Type**: ${{ github.event.inputs.version_type }}
-          - **Build Date**: ${{ fromJSON(format('"{0}"', toJSON(github.event.inputs))) && fromJSON('{}') || format('{0}', github.sha) }}
-          - **Package**: ${{ github.event.inputs.version_type == 'release' && format('Gloom-Gear-{0}.zip', github.event.inputs.release_tag) || format('Gloom-Gear-{0}-{1}.zip', github.event.inputs.release_tag, github.event.inputs.version_type) }}
-          - **File Structure**: Direct contents of PACK folder
-          
-          ## Installation
+          **Installation**
           Download and place the zip file directly in your Minecraft resource packs folder.
           
           ---
-          *Automatically generated release*
+          Released on ${{ steps.date.outputs.CURRENT_DATE }}
         files: |
           ${{ github.event.inputs.version_type == 'release' && format('Gloom-Gear-{0}.zip', github.event.inputs.release_tag) || format('Gloom-Gear-{0}-{1}.zip', github.event.inputs.release_tag, github.event.inputs.version_type) }}
         draft: false
