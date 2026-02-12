@@ -1,8 +1,6 @@
 name: Pack "PACK" Folder
 
 on:
-  push:
-    branches: [ main ]
   workflow_dispatch:
     inputs:
       release_tag:
@@ -48,7 +46,6 @@ jobs:
         ls -la PACK/ || echo "PACK directory does not exist"
 
     - name: Create Release resource pack
-      if: github.event_name == 'workflow_dispatch'
       run: |
         # 创建 Release 使用的文件 - 带版本信息
         cd PACK
@@ -60,8 +57,7 @@ jobs:
         cd ..
         echo "Release resource pack created with version info"
 
-    - name: Create Git Tag (Manual trigger only)
-      if: github.event_name == 'workflow_dispatch'
+    - name: Create Git Tag
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
@@ -78,13 +74,11 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Get current date
-      if: github.event_name == 'workflow_dispatch'
       id: date
       run: |
         echo "CURRENT_DATE=$(date '+%Y-%m-%d')" >> $GITHUB_OUTPUT
 
     - name: Set release name
-      if: github.event_name == 'workflow_dispatch'
       id: set-release-name
       run: |
         if [ "${{ github.event.inputs.version_type }}" = "release" ]; then
@@ -93,8 +87,7 @@ jobs:
           echo "RELEASE_NAME=${{ github.event.inputs.release_name }} ${{ github.event.inputs.release_tag }}-${{ github.event.inputs.version_type }}" >> $GITHUB_OUTPUT
         fi
 
-    - name: Create GitHub Release (Manual trigger only)
-      if: github.event_name == 'workflow_dispatch'
+    - name: Create GitHub Release
       uses: softprops/action-gh-release@v1
       with:
         tag_name: ${{ fromJSON(format('"{0}"', github.event.inputs.version_type)) && (github.event.inputs.version_type == 'release' && github.event.inputs.release_tag || format('{0}-{1}', github.event.inputs.release_tag, github.event.inputs.version_type)) }}
