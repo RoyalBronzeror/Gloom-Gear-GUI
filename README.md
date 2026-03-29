@@ -1,7 +1,7 @@
 # Gloom-Gear-GUI
 A GUI resource pack that redefines your Minecraft interface with deep hues, intricate machinery, gears, conduits, and ethereal glows.This resource pack gives you a different feel with an immersive dark mechanical GUI.
 
-This project is licensed under the [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International](LICENSE).
+This project is licensed under the [MIT Shader Code AND CC-BY-NC-SA 4.0 Assets ](LICENSE).
 
 This means you are free to:
 
